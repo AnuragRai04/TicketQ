@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>TicketQ Live Booking</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+        background: #111;
+        color: white;
+      }
+      .box {
+        background: #222;
+        padding: 30px;
+        border-radius: 10px;
+        display: inline-block;
+      }
+      h1 {
+        margin: 0 0 10px 0;
+        font-size: 3rem;
+        color: #00ff88;
+      }
+      input {
+        padding: 10px;
+        width: 300px;
+        margin-bottom: 20px;
+      }
+      button {
+        padding: 15px 30px;
+        background: #00ff88;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+      button:hover {
+        background: #00cc6a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h2>VIP Tier (Target ID: 3)</h2>
+      <p>Available Seats</p>
+      <h1 id="seatCount">2</h1>
+      <br />
+      <input type="text" id="jwtInput" placeholder="Paste your JWT here..." />
+      <br />
+      <button onclick="bookTicket()">BOOK NOW</button>
+      <p id="status"></p>
+    </div>
+
+    <script>
+      const targetTierId = 3;
+
+      // 1. Connect to our WebSocket server
+      const socket = io("http://127.0.0.1:3000");
+
+      // 2. Join the specific room for this tier
+      socket.emit("join_tier", targetTierId);
+
+      // 3. Listen for the server shouting seat updates!
+      socket.on("seat_update", (data) => {
+        document.getElementById("seatCount").innerText = data.availableSeats;
+
+        // Add a cool flash effect so we know it updated live
+        document.body.style.background = "#333";
+        setTimeout(() => (document.body.style.background = "#111"), 200);
+      });
+
+      // 4. The standard HTTP POST to add our booking to the queue
+      async function bookTicket() {
+        const token = document.getElementById("jwtInput").value;
+        const statusText = document.getElementById("status");
+
+        if (!token) return alert("Please paste your JWT first!");
+        statusText.innerText = "Queueing...";
+
+        try {
+          const response = await fetch("http://127.0.0.1:3000/api/bookings", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ tierId: targetTierId, quantity: 1 }),
+          });
+
+          const result = await response.json();
+          if (response.ok)
+            statusText.innerText = "Queued! Job ID: " + result.jobId;
+          else statusText.innerText = "Error: " + result.error;
+        } catch (err) {
+          statusText.innerText = "Network Error!";
+        }
+      }
+    </script>
+  </body>
+</html>

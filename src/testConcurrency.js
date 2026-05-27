@@ -1,5 +1,5 @@
 const jwtToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3ODQzOTYxMywiZXhwIjoxNzc4NDQzMjEzfQ.hRWtqBCpCgoZ9nl7BF7pX6JiK6Mo6Kqe2Uho60IjtKA"; // <-- Don't forget this!
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc3ODQ4MDg3OSwiZXhwIjoxNzc4NDg0NDc5fQ.ffGT2F4Yxc03yGpDMb29VeS8xg9vOovpig7JxEgloSc"; // <-- Don't forget this!
 const targetTierId = 3; // The ID of the VIP tier with only 2 seats
 const quantityPerRequest = 1;
 
